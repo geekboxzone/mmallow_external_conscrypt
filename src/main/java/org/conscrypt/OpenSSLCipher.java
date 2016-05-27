@@ -891,6 +891,7 @@ public abstract class OpenSSLCipher extends CipherSpi {
         }
 
         private void reset() {
+            aad = null;
             final int lastBufSize = lastGlobalMessageSize;
             if (buf == null) {
                 buf = new byte[lastBufSize];
@@ -1052,12 +1053,13 @@ public abstract class OpenSSLCipher extends CipherSpi {
         /* @Override */
         protected void engineUpdateAAD(byte[] input, int inputOffset, int inputLen) {
             if (aad == null) {
-                aad = Arrays.copyOfRange(input, inputOffset, inputLen);
+                aad = Arrays.copyOfRange(input, inputOffset, inputOffset + inputLen);
             } else {
                 int newSize = aad.length + inputLen;
                 byte[] newaad = new byte[newSize];
                 System.arraycopy(aad, 0, newaad, 0, aad.length);
                 System.arraycopy(input, inputOffset, newaad, aad.length, inputLen);
+                aad = newaad;
             }
         }
 
